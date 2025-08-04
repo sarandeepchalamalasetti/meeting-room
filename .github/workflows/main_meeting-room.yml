@@ -10,10 +10,16 @@ jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: read # This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Show current directory (debug)
+        run: pwd
+
+      - name: List root folder contents (debug)
+        run: dir
 
       - name: Set up Node.js version
         uses: actions/setup-node@v3
@@ -37,8 +43,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      id-token: write # Required for requesting the JWT
-      contents: read # Required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
       - name: Download artifact from build job
