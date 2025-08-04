@@ -1,0 +1,74 @@
+[
+  {
+    "id": "wing-a-conf-1",
+    "name": "Conference Room A1",
+    "capacity": 12,
+    "floor": "Floor 1",
+    "wing": "Wing A",
+    "equipment": ["Projector", "Whiteboard", "Video Conf", "Audio System"],
+    "description": "Large conference room perfect for team meetings and presentations"
+  },
+  {
+    "id": "wing-a-board",
+    "name": "Board Room A2",
+    "capacity": 16,
+    "floor": "Floor 2",
+    "wing": "Wing A",
+    "equipment": ["4K Display", "Video Conf", "Premium Audio", "Catering Setup"],
+    "description": "Executive boardroom for high-level meetings and presentations"
+  },
+  {
+    "id": "wing-a-meeting-1",
+    "name": "Meeting Room A3",
+    "capacity": 8,
+    "floor": "Floor 1",
+    "wing": "Wing A",
+    "equipment": ["TV Display", "Whiteboard", "Video Conf"],
+    "description": "Cozy meeting room ideal for small team discussions"
+  },
+  {
+    "id": "wing-a-creative",
+    "name": "Creative Space A4",
+    "capacity": 10,
+    "floor": "Floor 2",
+    "wing": "Wing A",
+    "equipment": ["Interactive Display", "Whiteboard", "Design Tools"],
+    "description": "Modern creative space with innovative collaboration tools"
+  },
+  {
+    "id": "wing-b-training",
+    "name": "Training Room B1",
+    "capacity": 20,
+    "floor": "Floor 1",
+    "wing": "Wing B",
+    "equipment": ["Projector", "Whiteboard", "Audio System", "Multiple Displays"],
+    "description": "Spacious training room with flexible seating arrangements"
+  },
+  {
+    "id": "wing-b-discussion",
+    "name": "Discussion Room B2",
+    "capacity": 6,
+    "floor": "Floor 2",
+    "wing": "Wing B",
+    "equipment": ["Whiteboard", "TV Display"],
+    "description": "Intimate space for focused discussions and brainstorming"
+  },
+  {
+    "id": "wing-b-meeting-1",
+    "name": "Small Meeting B3",
+    "capacity": 4,
+    "floor": "Floor 1",
+    "wing": "Wing B",
+    "equipment": ["TV Display", "Whiteboard"],
+    "description": "Compact meeting room for quick discussions"
+  },
+  {
+    "id": "wing-b-meeting-2",
+    "name": "Small Meeting B4",
+    "capacity": 4,
+    "floor": "Floor 2",
+    "wing": "Wing B",
+    "equipment": ["TV Display", "Whiteboard"],
+    "description": "Compact meeting room for quick discussions"
+  }
+]

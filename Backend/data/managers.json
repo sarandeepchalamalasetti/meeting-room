@@ -1,0 +1,20 @@
+{
+  "managers": [
+    {
+      "name": "Sarandeep Chalamalasetti",
+      "email": "sarandeep.chalamalasetti@ispace.com",
+      "employeeId": "EI-850",
+      "role": "manager",
+      "team": "Engineering",
+      "department": "Technology"
+    },
+    {
+      "name": "AjayKumar Ummadi",
+      "email": "ajay.ummadi@ispace.com",
+      "employeeId": "EI-105",
+      "role": "manager",
+      "team": "Product Development",
+      "department": "Technology"
+    }
+  ]
+}

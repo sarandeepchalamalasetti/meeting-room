@@ -1,0 +1,18 @@
+{
+  "hr": [
+    {
+      "name": "Venkatesh Chembeti",
+      "email": "venkatesh.chembeti@ispace.com",
+      "employeeId": "EI-666",
+      "role": "hr",
+      "department": "Human Resources"
+    },
+    {
+      "name": "Ritik Patel",
+      "email": "ritik.patel@ispace.com",
+      "employeeId": "EI-9114",
+      "role": "hr",
+      "department": "Human Resources"
+    }
+  ]
+}
