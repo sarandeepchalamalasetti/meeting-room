@@ -1,0 +1,255 @@
+/* ✅ EXISTING: Base grid layout */
+.status-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+}
+
+/* ✅ NEW: 5-card layout for Manager and Employee */
+.status-stats-grid.full-layout {
+    grid-template-columns: repeat(5, 1fr);
+}
+
+/* ✅ EXISTING: 3-card layout for HR */
+.status-stats-grid.hr-layout {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.stats-card {
+    background: white;
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.stats-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+}
+
+.stats-card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 1.5rem 0.75rem;
+}
+
+.stats-card-body {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px; 
+}
+
+.stats-row-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stats-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+    flex-shrink: 0;
+}
+
+/* ✅ EXISTING: Icon container colors */
+.stats-icon-primary { background-color: #dbeafe; }
+.stats-icon-success { background-color: #dcfce7; }
+.stats-icon-warning { background-color: #fef3c7; }
+.stats-icon-error { background-color: #fee2e2; }
+
+/* ✅ NEW: Available rooms icon styling */
+.stats-icon-available { 
+    background-color: #f0fdf4; 
+}
+
+.stats-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.stats-icon-primary .stats-icon { color: #2563eb; }
+.stats-icon-success .stats-icon { color: #16a34a; }
+.stats-icon-warning .stats-icon { color: #ca8a04; }
+.stats-icon-error .stats-icon { color: #dc2626; }
+.stats-icon-available .stats-icon { color: #10b981; }
+
+.stats-content {
+    flex: 1;
+}
+
+.stats-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 0.25rem 0;
+}
+
+.stats-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+    font-weight: bold;
+}
+
+.stats-card-content {
+    padding: 0 1.5rem 1.5rem;
+}
+
+.stats-change {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.trend-icon {
+    width: 1rem;
+    height: 1rem;
+}
+
+.trend-up { color: #16a34a; }
+.trend-down { color: #dc2626; }
+
+.trend-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.trend-positive { color: #16a34a; }
+.trend-negative { color: #dc2626; }
+
+/* ✅ NEW: Error state styling */
+.stats-card.error-card {
+    grid-column: 1 / -1;
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+.retry-button {
+    background-color: #dc2626;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.375rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.retry-button:hover {
+    background-color: #b91c1c;
+}
+
+/* ✅ EXISTING: HR Role - 3 cards layout */
+.status-stats-grid:has(.stats-card:nth-child(3):last-child) {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* ✅ UPDATED: Responsive design for 5-card layout */
+@media (max-width: 1400px) {
+    .status-stats-grid.full-layout {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .status-stats-grid.full-layout .stats-card:nth-child(4) {
+        grid-column: 1 / 3;
+    }
+    
+    .status-stats-grid.full-layout .stats-card:nth-child(5) {
+        grid-column: 3 / 4;
+    }
+}
+
+@media (max-width: 1000px) {
+    .status-stats-grid.full-layout,
+    .status-stats-grid.hr-layout {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .status-stats-grid.full-layout .stats-card:nth-child(5) {
+        grid-column: 1 / -1;
+    }
+    
+    .status-stats-grid.full-layout .stats-card:nth-child(4) {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .status-stats-grid,
+    .status-stats-grid.full-layout,
+    .status-stats-grid.hr-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .status-stats-grid.full-layout .stats-card:nth-child(4),
+    .status-stats-grid.full-layout .stats-card:nth-child(5) {
+        grid-column: auto;
+    }
+}
+
+/* ✅ NEW: Loading animation */
+.stats-card.loading {
+    opacity: 0.7;
+}
+
+.stats-card.loading .stats-value {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading-shimmer 1.5s infinite;
+    color: transparent;
+    border-radius: 0.25rem;
+    width: 3rem;
+    height: 2rem;
+}
+
+@keyframes loading-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ✅ NEW: Enhanced hover effects */
+.stats-card:hover .stats-icon-container {
+    transform: scale(1.05);
+}
+
+.stats-card:hover .stats-value {
+    transform: scale(1.02);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .stats-card {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .stats-value {
+        color: #f9fafb;
+    }
+    
+    .stats-label {
+        color: #d1d5db;
+    }
+    
+    .trend-text {
+        color: #d1d5db;
+    }
+    
+    .stats-card.error-card {
+        background: #1f2937;
+        border-color: #374151;
+    }
+}

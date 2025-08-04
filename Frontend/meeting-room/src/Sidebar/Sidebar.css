@@ -1,0 +1,234 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.sidebar {
+  width: 240px;
+  background-color: #ffffff;
+  height: 100vh;
+  border-right: 1px solid #e9ecef;
+  padding: 2px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100vh;
+  position: relative;
+  transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+  width: 80px;
+}
+
+.ispace-logo-wrapper-sidebar {
+  font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+  font-size: 2.5rem;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  background-color: transparent;
+  padding: 5px;
+  justify-content: center;
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.sidebar.collapsed .ispace-logo-wrapper-sidebar {
+  justify-content: center;
+  padding: 5px 0;
+}
+
+.i-letter {
+  color: red;
+  transition: opacity 0.3s ease;
+}
+
+.space-text-black {
+  color: black;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar.collapsed .i-letter,
+.sidebar.collapsed .space-text-black {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+.ispace-logo-img {
+  width: 2.5rem;
+  height: auto;
+  margin-left: -0.4rem;
+  transition: margin 0.3s ease;
+}
+
+.sidebar.collapsed .ispace-logo-img {
+  margin-left: 0;
+}
+
+.brand h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
+}
+
+.nav-menu {
+  flex: 1;
+  padding: 0 10px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #6c757d;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 12px 8px;
+}
+
+.nav-item:hover {
+  background-color: #f8f9fa;
+  color: #495057;
+}
+
+.nav-item.active {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.nav-item.active:hover {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: margin 0.3s ease;
+}
+
+.sidebar.collapsed .nav-icon {
+  margin-right: 0;
+}
+
+.nav-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sidebar-toggle-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 1px;
+  width: 24px;
+  height: 24px;
+  border: none;
+background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.toggle-btn:hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.toggle-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.toggle-btn:hover .toggle-icon {
+  transform: scale(1.1);
+}
+
+/* Hide text in collapsed state */
+.sidebar.collapsed .nav-item {
+  position: relative;
+}
+
+.sidebar.collapsed .nav-item::after {
+  content: attr(title);
+  position: absolute;
+  left: 60px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #333;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+}
+
+.sidebar.collapsed .nav-item:hover::after {
+  opacity: 1;
+}
+
+/* Animation for text visibility */
+.sidebar:not(.collapsed) .nav-item {
+  animation: fadeInText 0.3s ease 0.2s both;
+}
+
+@keyframes fadeInText {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease, width 0.3s ease;
+  }
+  
+  .sidebar.collapsed {
+    transform: translateX(-60px);
+  }
+  
+  .sidebar:not(.collapsed) {
+    transform: translateX(0);
+  }
+}

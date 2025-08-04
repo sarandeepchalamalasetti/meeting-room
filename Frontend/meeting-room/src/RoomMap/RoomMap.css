@@ -1,0 +1,1197 @@
+.roommap-container {
+  display: flex;
+  height: 100vh;
+  background-color: #f9fafb;
+}
+
+.roommap-sidebar {
+  width: 16rem;
+  background-color: white;
+  border-right: 1px solid #e5e7eb;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.roommap-sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.roommap-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.roommap-section-icon {
+  width: 1rem;
+  height: 1rem;
+  color: #6b7280;
+}
+
+.roommap-section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+}
+
+.roommap-floor-select {
+  width: 100%;
+  font-size: 0.875rem;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: white;
+  color: #374151;
+}
+
+.roommap-floor-select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.roommap-offline-notice {
+  font-size: 0.75rem;
+  color: #dc2626;
+  font-style: italic;
+  margin: 0.25rem 0 0 0;
+}
+
+.roommap-separator {
+  border: none;
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 0;
+}
+
+.roommap-status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.roommap-status-item {
+  text-align: center;
+}
+
+.roommap-status-count {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.25rem;
+}
+
+/* ✅ UPDATED: Status colors to match requirements */
+.roommap-status-count-available {
+  background-color: #dcfce7; /* Green for available */
+}
+
+.roommap-status-count-occupied {
+  background-color: #fee2e2; /* Red for occupied */
+}
+
+.roommap-status-count-pending {
+  background-color: #fef3c7; /* Orange for pending */
+}
+
+.roommap-status-count-total {
+  background-color: #f3f4f6;
+}
+
+.roommap-count-number {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.roommap-status-count-available .roommap-count-number {
+  color: #16a34a; /* Green text */
+}
+
+.roommap-status-count-occupied .roommap-count-number {
+  color: #dc2626; /* Red text */
+}
+
+.roommap-status-count-pending .roommap-count-number {
+  color: #ca8a04; /* Orange text */
+}
+
+.roommap-status-count-total .roommap-count-number {
+  color: #6b7280;
+}
+
+.roommap-status-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.roommap-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.roommap-search-container {
+  position: relative;
+}
+
+.roommap-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1rem;
+  height: 1rem;
+  color: #9ca3af;
+}
+
+.roommap-search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: white;
+  font-size: 0.875rem;
+}
+
+.roommap-search-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.roommap-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.roommap-filter-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.roommap-filter-select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: white;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.roommap-filter-select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.roommap-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.roommap-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.roommap-legend-color {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+  border: 1px solid #d1d5db;
+}
+
+/* ✅ UPDATED: Legend colors to match new status colors */
+.roommap-legend-color-available {
+  background-color: #dcfce7; /* Green */
+  border-color: #bbf7d0;
+}
+
+.roommap-legend-color-pending {
+  background-color: #fef3c7; /* Orange */
+  border-color: #fde68a;
+}
+
+.roommap-legend-color-occupied {
+  background-color: #fee2e2; /* Red */
+  border-color: #fecaca;
+}
+
+.roommap-legend-text {
+  font-size: 0.75rem;
+  color: #374151;
+}
+
+.roommap-main {
+  flex: 1;
+  padding: 1.5rem;
+}
+
+.roommap-main-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.roommap-main-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.roommap-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.roommap-header-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.roommap-header-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #6b7280;
+}
+
+.roommap-header-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.roommap-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.roommap-details-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: white;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.roommap-details-toggle:hover {
+  background-color: #f9fafb;
+}
+
+.roommap-details-toggle-active {
+  background-color: #1f2937;
+  color: white;
+  border-color: #1f2937;
+}
+
+.roommap-toggle-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.roommap-room-count {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.roommap-view-tabs {
+  margin-top: 1rem;
+}
+
+.roommap-tabs-list {
+  display: flex;
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  width: fit-content;
+}
+
+.roommap-tab-trigger {
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #6b7280;
+}
+
+.roommap-tab-trigger-active {
+  background-color: white;
+  color: #1f2937;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.roommap-main-content {
+  padding: 1.5rem;
+  background-color: #f9fafb;
+  flex: 1;
+  overflow: auto;
+}
+
+/* Loading Styles */
+.roommap-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 1rem;
+}
+
+.roommap-loading-spinner {
+  width: 2rem;
+  height: 2rem;
+  color: #2563eb;
+  animation: roommap-spin 1s linear infinite;
+}
+
+@keyframes roommap-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Layout View Styles */
+.roommap-layout-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  height: 100%;
+}
+
+.roommap-wing-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 1rem;
+}
+
+.roommap-wing-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.roommap-wing-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.roommap-wing-status {
+  width: 0.75rem;
+  height: 0.75rem;
+  background-color: #22c55e;
+  border-radius: 50%;
+}
+
+.roommap-wing-rooms {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.roommap-room-card {
+  border: 2px solid;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 10rem;
+  position: relative;
+}
+
+.roommap-room-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* ✅ UPDATED: Room card colors to match new status scheme */
+.roommap-room-card-available {
+  background-color: #f0fdf4; /* Light green */
+  border-color: #bbf7d0;
+}
+
+.roommap-room-card-occupied {
+  background-color: #fef2f2; /* Light red */
+  border-color: #fecaca;
+}
+
+.roommap-room-card-pending {
+  background-color: #fffbeb; /* Light orange */
+  border-color: #fde68a;
+}
+
+.roommap-status-dot {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+}
+
+/* ✅ UPDATED: Status dot colors */
+.roommap-status-dot-available {
+  background-color: #22c55e; /* Green */
+}
+
+.roommap-status-dot-occupied {
+  background-color: #ef4444; /* Red */
+}
+
+.roommap-status-dot-pending {
+  background-color: #eab308; /* Orange */
+}
+
+.roommap-room-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.roommap-room-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.roommap-room-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.roommap-room-capacity {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.roommap-room-equipment {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.roommap-equipment-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.roommap-equipment-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+  color: #6b7280;
+}
+
+.roommap-equipment-name {
+  font-size: 0.75rem;
+  color: #374151;
+}
+
+/* List View Styles */
+.roommap-list-view {
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.roommap-list-container {
+  overflow-x: auto;
+}
+
+.roommap-rooms-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.roommap-table-header {
+  background-color: #f9fafb;
+}
+
+.roommap-table-head {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.roommap-table-body {
+  background-color: white;
+}
+
+.roommap-list-row {
+  border-bottom: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.roommap-list-row:hover {
+  background-color: #f9fafb;
+}
+
+.roommap-list-cell {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.roommap-room-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.roommap-status-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ✅ UPDATED: Status icon colors */
+.roommap-status-icon-available {
+  color: #16a34a; /* Green */
+}
+
+.roommap-status-icon-occupied {
+  color: #dc2626; /* Red */
+}
+
+.roommap-status-icon-pending {
+  color: #ca8a04; /* Orange */
+}
+
+.roommap-room-name-list {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.roommap-status-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+}
+
+/* ✅ UPDATED: Status badge colors */
+.roommap-status-badge-available {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.roommap-status-badge-occupied {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.roommap-status-badge-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.roommap-equipment-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.roommap-equipment-badge {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+/* Grid View Styles */
+.roommap-grid-view {
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 1rem;
+}
+
+.roommap-grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.roommap-grid-card {
+  border: 2px solid;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.roommap-grid-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* ✅ UPDATED: Grid card colors */
+.roommap-grid-card-available {
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.roommap-grid-card-occupied {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+}
+
+.roommap-grid-card-pending {
+  background-color: #fffbeb;
+  border-color: #fde68a;
+}
+
+.roommap-grid-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.roommap-grid-card-info {
+  flex: 1;
+}
+
+.roommap-grid-card-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.roommap-grid-card-location {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.roommap-grid-status-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ✅ UPDATED: Grid status icon colors */
+.roommap-grid-status-icon-available {
+  color: #16a34a;
+}
+
+.roommap-grid-status-icon-occupied {
+  color: #dc2626;
+}
+
+.roommap-grid-status-icon-pending {
+  color: #ca8a04;
+}
+
+.roommap-grid-card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.roommap-grid-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.roommap-grid-detail-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.roommap-grid-equipment {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.roommap-grid-equipment-badge {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+/* Dialog Styles */
+.roommap-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.roommap-booking-dialog {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  max-width: 36rem;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.roommap-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.roommap-dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.roommap-dialog-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #2563eb;
+}
+
+.roommap-dialog-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.roommap-dialog-close:hover {
+  color: #374151;
+}
+
+.roommap-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.roommap-dialog-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.roommap-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.roommap-info-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.roommap-info-value {
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+/* ✅ NEW: Conflict Alert Styles */
+.roommap-conflict-alert {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border-left: 4px solid #dc2626;
+  margin-bottom: 1rem;
+}
+
+.roommap-conflict-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.roommap-conflict-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #dc2626;
+}
+
+.roommap-conflict-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #991b1b;
+}
+
+.roommap-conflict-message {
+  font-size: 0.875rem;
+  color: #7f1d1d;
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.roommap-conflict-details {
+  background: #ffffff;
+  border: 1px solid #f3f4f6;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.roommap-conflict-details strong {
+  color: #374151;
+  font-weight: 600;
+}
+
+.roommap-conflict-details ul {
+  margin: 8px 0 0 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.roommap-conflict-details li {
+  font-size: 13px;
+  color: #4b5563;
+  margin-bottom: 4px;
+}
+
+.roommap-conflict-details li strong {
+  color: #374151;
+}
+
+.roommap-conflict-suggestion {
+  font-size: 0.875rem;
+  color: #7f1d1d;
+  background: #ffffff;
+  border: 1px dashed #fca5a5;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  font-style: italic;
+}
+
+/* ✅ NEW: Booking Form Styles */
+.roommap-booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.roommap-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.roommap-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.roommap-form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.roommap-form-input,
+.roommap-form-textarea {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: #374151;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+.roommap-form-input:focus,
+.roommap-form-textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.roommap-form-input-error {
+  border-color: #dc2626;
+}
+
+.roommap-form-input-error:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.roommap-form-input-conflict {
+  border-color: #fca5a5 !important;
+  background-color: #fef7f7 !important;
+}
+
+.roommap-form-input-conflict:focus {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+
+.roommap-form-textarea {
+  min-height: 4rem;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.roommap-form-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #dc2626;
+}
+
+.roommap-error-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+}
+
+.roommap-dialog-equipment {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.roommap-equipment-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.roommap-equipment-item-dialog {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.roommap-equipment-icon-dialog {
+  width: 1rem;
+  height: 1rem;
+  color: #6b7280;
+}
+
+.roommap-dialog-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.roommap-book-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease;
+}
+
+.roommap-book-button:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.roommap-book-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.roommap-cancel-button {
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  background-color: white;
+  color: #374151;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease;
+}
+
+.roommap-cancel-button:hover:not(:disabled) {
+  background-color: #f9fafb;
+}
+
+.roommap-cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.roommap-button-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ✅ NEW: Employee approval notice */
+.roommap-approval-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.roommap-notice-icon {
+  width: 1rem;
+  height: 1rem;
+  color: #0284c7;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.roommap-notice-text {
+  font-size: 0.875rem;
+  color: #0c4a6e;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .roommap-container {
+    flex-direction: column;
+  }
+  
+  .roommap-sidebar {
+    width: 100%;
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+  
+  .roommap-layout-view {
+    grid-template-columns: 1fr;
+  }
+  
+  .roommap-wing-rooms {
+    grid-template-columns: 1fr;
+  }
+  
+  .roommap-grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+
+  .roommap-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .roommap-dialog-info {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .roommap-sidebar {
+    padding: 0.75rem;
+  }
+  
+  .roommap-main {
+    padding: 1rem;
+  }
+  
+  .roommap-status-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .roommap-header-content {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .roommap-list-container {
+    font-size: 0.75rem;
+  }
+  
+  .roommap-equipment-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .roommap-booking-dialog {
+    width: 95%;
+    padding: 1rem;
+  }
+
+  .roommap-dialog-actions {
+    flex-direction: column;
+  }
+}

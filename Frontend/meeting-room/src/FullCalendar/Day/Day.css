@@ -1,0 +1,595 @@
+.day-view-container {
+  padding: 24px;
+  min-height: 500px;
+  position: relative;
+}
+
+/* ✅ Enhanced day header */
+.day-header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.day-date-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #374151;
+}
+
+.day-schedule-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* ✅ Day statistics */
+.day-stats {
+  display: flex;
+  gap: 16px;
+}
+
+.day-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.stat-number {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ✅ Bookings summary section */
+.day-bookings-summary {
+  margin-bottom: 32px;
+}
+
+.day-bookings-summary h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.bookings-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.booking-summary-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid;
+  border-radius: 6px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.booking-summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ✅ Status-based card styling */
+.booking-summary-card.upcoming {
+  border-left-color: #3b82f6;
+  background: linear-gradient(to right, #f0f9ff, #ffffff);
+}
+
+.booking-summary-card.completed {
+  border-left-color: #10b981;
+  background: linear-gradient(to right, #f0fdf4, #ffffff);
+}
+
+.booking-summary-card.pending {
+  border-left-color: #f59e0b;
+  background: linear-gradient(to right, #fffbeb, #ffffff);
+}
+
+.booking-summary-card.approved {
+  border-left-color: #10b981;
+  background: linear-gradient(to right, #f0fdf4, #ffffff);
+}
+
+.booking-summary-card.rejected {
+  border-left-color: #ef4444;
+  background: linear-gradient(to right, #fef2f2, #ffffff);
+}
+
+.booking-summary-card.cancelled {
+  border-left-color: #6b7280;
+  background: linear-gradient(to right, #f9fafb, #ffffff);
+  opacity: 0.8;
+}
+
+.booking-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.booking-room-name {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 16px;
+}
+
+.booking-status-label {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.booking-status-label.upcoming {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.booking-status-label.completed {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.booking-status-label.pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.booking-status-label.approved {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.booking-status-label.rejected {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.booking-status-label.cancelled {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+}
+
+.booking-summary-details {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.booking-detail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.booking-purpose-summary {
+  color: #374151;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* ✅ Time slots section */
+.day-timeslots-section {
+  margin-bottom: 24px;
+}
+
+.day-timeslots-section h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.day-timeslots-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.day-time-column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.day-time-slot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #f3f4f6;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.day-time-slot:hover {
+  border-color: #e5e7eb;
+  background: #f9fafb;
+}
+
+/* ✅ Status-based slot styling */
+.day-time-slot.available {
+  background: #ffffff;
+  border-color: #e5e7eb;
+}
+
+.day-time-slot.upcoming {
+  background: #f0f9ff;
+  border-color: #93c5fd;
+}
+
+.day-time-slot.completed {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.day-time-slot.pending {
+  background: #fffbeb;
+  border-color: #fbbf24;
+}
+
+.day-time-slot.approved {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.day-time-slot.rejected {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+.day-time-slot.cancelled {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  opacity: 0.7;
+}
+
+.day-time-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  min-width: 60px;
+}
+
+.day-availability-status {
+  flex: 1;
+  margin-left: 12px;
+}
+
+.day-status-text {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ✅ Status text colors */
+.day-availability-status.available .day-status-text {
+  color: #059669;
+}
+
+.day-availability-status.upcoming .day-status-text {
+  color: #3b82f6;
+}
+
+.day-availability-status.completed .day-status-text {
+  color: #10b981;
+}
+
+.day-availability-status.pending .day-status-text {
+  color: #f59e0b;
+}
+
+.day-availability-status.approved .day-status-text {
+  color: #10b981;
+}
+
+.day-availability-status.rejected .day-status-text {
+  color: #ef4444;
+}
+
+.day-availability-status.cancelled .day-status-text {
+  color: #6b7280;
+}
+
+/* ✅ Booking info in time slots */
+.day-booking-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.booking-start-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.booking-room-mini {
+  font-size: 10px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* ✅ Status indicators */
+.day-availability-status.available::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.day-availability-status.upcoming::before {
+  background: #3b82f6;
+}
+
+.day-availability-status.completed::before {
+  background: #10b981;
+}
+
+.day-availability-status.pending::before {
+  background: #f59e0b;
+}
+
+.day-availability-status.approved::before {
+  background: #10b981;
+}
+
+.day-availability-status.rejected::before {
+  background: #ef4444;
+}
+
+.day-availability-status.cancelled::before {
+  background: #6b7280;
+}
+
+/* ✅ Empty state */
+.day-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 64px 32px;
+  color: #6b7280;
+}
+
+.day-empty-state h3 {
+  margin: 16px 0 8px 0;
+  color: #374151;
+  font-weight: 500;
+}
+
+.day-empty-state p {
+  margin: 0;
+  color: #9ca3af;
+}
+
+/* ✅ Tooltip styles */
+.booking-tooltip {
+  position: fixed;
+  background: #1f2937;
+  color: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  z-index: 1000;
+  max-width: 280px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+.booking-tooltip::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #1f2937;
+}
+
+.tooltip-header {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 4px;
+}
+
+.tooltip-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.tooltip-label {
+  color: #d1d5db;
+  font-size: 11px;
+  min-width: 60px;
+}
+
+.tooltip-value {
+  color: #ffffff;
+  font-weight: 500;
+  text-align: right;
+  flex: 1;
+}
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-indicator.upcoming {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+}
+
+.status-indicator.completed {
+  background: rgba(16, 185, 129, 0.2);
+  color: #86efac;
+}
+
+.status-indicator.pending {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+.status-indicator.approved {
+  background: rgba(16, 185, 129, 0.2);
+  color: #86efac;
+}
+
+.status-indicator.rejected {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.status-indicator.cancelled {
+  background: rgba(107, 114, 128, 0.2);
+  color: #d1d5db;
+}
+
+@media (max-width: 768px) {
+  .day-view-container {
+    padding: 16px;
+  }
+  
+  .day-header-section {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .day-stats {
+    justify-content: center;
+    gap: 12px;
+  }
+  
+  .bookings-list {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .day-timeslots-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .day-time-slot {
+    padding: 6px 8px;
+  }
+  
+  .day-time-label {
+    min-width: 50px;
+    font-size: 12px;
+  }
+  
+  .day-status-text {
+    font-size: 10px;
+  }
+  
+  .booking-summary-card {
+    padding: 12px;
+  }
+  
+  .booking-room-name {
+    font-size: 14px;
+  }
+  
+  .booking-detail {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .day-view-container {
+    padding: 12px;
+  }
+  
+  .day-header-section {
+    margin-bottom: 16px;
+  }
+  
+  .day-schedule-text {
+    font-size: 14px;
+  }
+  
+  .day-stats {
+    gap: 8px;
+  }
+  
+  .day-stat-item {
+    padding: 6px 8px;
+  }
+  
+  .stat-number {
+    font-size: 16px;
+  }
+  
+  .day-time-slot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 6px 8px;
+  }
+  
+  .day-availability-status {
+    margin-left: 0;
+  }
+  
+  .booking-summary-details {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .day-empty-state {
+    padding: 32px 16px;
+  }
+}

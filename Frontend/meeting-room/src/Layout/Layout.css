@@ -1,0 +1,17 @@
+.layout-wrapper {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.layout-main-area {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.layout-main-area > .layout-main {
+  flex: 1;
+  overflow-y: auto;
+}

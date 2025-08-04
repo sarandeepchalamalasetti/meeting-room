@@ -1,0 +1,923 @@
+.dashboard {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f9fafb;
+    min-height: 100vh;
+    padding: 1.5rem;
+}
+
+.dashboard-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.dashboard-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+/* Enhanced Dashboard Controls */
+.dashboard-dashboard-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0.75rem;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-control-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Dropdown Styles */
+.dashboard-dropdown-container {
+    position: relative;
+}
+
+.dashboard-dropdown-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    min-width: 120px;
+    justify-content: space-between;
+}
+
+/* ✅ NEW: Active filter state styling */
+.dashboard-dropdown-button.active {
+    background: #eff6ff;
+    border-color: #3b82f6;
+    color: #1e40af;
+    font-weight: 600;
+}
+
+.dashboard-dropdown-button:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.dashboard-dropdown-button.active:hover {
+    background: #dbeafe;
+    border-color: #2563eb;
+}
+
+.dashboard-dropdown-button:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.dashboard-dropdown-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f3f4f6;
+}
+
+.dashboard-dropdown-icon {
+    font-size: 1rem;
+    color: #6b7280;
+    transition: transform 0.2s ease;
+}
+
+.dashboard-dropdown-button.active .dashboard-dropdown-icon {
+    color: #3b82f6;
+}
+
+.dashboard-dropdown-button[aria-expanded="true"] .dashboard-dropdown-icon {
+    transform: rotate(180deg);
+}
+
+.dashboard-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    margin-top: 0.25rem;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.dashboard-dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    color: #374151;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-align: left;
+}
+
+.dashboard-dropdown-item:hover {
+    background: #f3f4f6;
+}
+
+.dashboard-dropdown-item.selected {
+    background: #eff6ff;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.dashboard-dropdown-item:first-child {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+}
+
+.dashboard-dropdown-item:last-child {
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
+
+/* Calendar Styles */
+.dashboard-calendar-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.dashboard-calendar-icon {
+    position: absolute;
+    left: 0.75rem;
+    font-size: 1rem;
+    color: #6b7280;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.dashboard-calendar-input {
+    padding: 0.625rem 1rem 0.625rem 2.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: #374151;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 140px;
+}
+
+/* ✅ NEW: Active calendar input state */
+.dashboard-calendar-input.active {
+    background: #eff6ff;
+    border-color: #3b82f6;
+    color: #1e40af;
+    font-weight: 600;
+}
+
+.dashboard-calendar-input.active + .dashboard-calendar-icon {
+    color: #3b82f6;
+}
+
+.dashboard-calendar-input:hover {
+    border-color: #9ca3af;
+}
+
+.dashboard-calendar-input.active:hover {
+    background: #dbeafe;
+    border-color: #2563eb;
+}
+
+.dashboard-calendar-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.dashboard-calendar-input::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 0.75rem;
+    opacity: 0;
+    cursor: pointer;
+    width: 1rem;
+    height: 1rem;
+}
+
+.dashboard-clear-date-btn {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 50%;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 2;
+}
+
+.dashboard-clear-date-btn:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+/* Enhanced Notification Styles (existing styles preserved) */
+.dashboard-notification-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.dashboard-notification-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dashboard-notification-button:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    transform: translateY(-1px);
+}
+
+.dashboard-notification-button:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.dashboard-notification-button:active {
+    transform: translateY(0);
+}
+
+.dashboard-notification-button.dashboard-has-notifications {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.dashboard-notification-button.dashboard-has-notifications:hover {
+    background: #fee2e2;
+}
+
+.dashboard-notification-icon {
+    font-size: 1.25rem;
+    color: #6b7280;
+    transition: all 0.2s ease;
+}
+
+.dashboard-notification-icon.dashboard-notification-active {
+    color: #ef4444;
+    animation: dashboard-notification-pulse 2s infinite;
+}
+
+.dashboard-notification-button:hover .dashboard-notification-icon {
+    color: #374151;
+}
+
+.dashboard-notification-count {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding: 0 0.25rem;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    border: 2px solid #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    animation: dashboard-notification-count-pulse 2s infinite;
+}
+
+@keyframes dashboard-notification-pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes dashboard-notification-count-pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Notification Dropdown Styles (existing styles preserved) */
+.dashboard-notification-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    width: 400px;
+    max-width: 90vw;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.dashboard-notification-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.dashboard-notification-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.dashboard-notification-header-icon {
+    font-size: 1rem;
+    color: #6b7280;
+}
+
+.dashboard-notification-header-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding: 0 0.375rem;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    margin-left: 0.25rem;
+}
+
+.dashboard-notification-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.dashboard-notification-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    background: transparent;
+    border: none;
+    border-radius: 0.375rem;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+}
+
+.dashboard-notification-action-btn:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.dashboard-notification-content {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.dashboard-notification-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    gap: 0.75rem;
+    color: #6b7280;
+}
+
+.dashboard-notification-loading-spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid #e5e7eb;
+    border-top: 2px solid #3b82f6;
+    border-radius: 50%;
+    animation: dashboard-notification-spin 1s linear infinite;
+}
+
+@keyframes dashboard-notification-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.dashboard-notification-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+    color: #6b7280;
+}
+
+.dashboard-notification-empty-icon {
+    font-size: 3rem;
+    color: #d1d5db;
+    margin-bottom: 1rem;
+}
+
+.dashboard-notification-empty h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 0.5rem 0;
+}
+
+.dashboard-notification-empty p {
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.dashboard-notification-list {
+    padding: 0;
+}
+
+.dashboard-notification-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #f3f4f6;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.dashboard-notification-item:last-child {
+    border-bottom: none;
+}
+
+.dashboard-notification-item:hover {
+    background: #f9fafb;
+}
+
+.dashboard-notification-item.dashboard-notification-unread {
+    background: #eff6ff;
+    border-left: 3px solid #3b82f6;
+}
+
+.dashboard-notification-item.dashboard-notification-unread:hover {
+    background: #dbeafe;
+}
+
+.dashboard-notification-item.dashboard-notification-priority-high {
+    border-left: 3px solid #ef4444;
+}
+
+.dashboard-notification-item.dashboard-notification-priority-medium {
+    border-left: 3px solid #f59e0b;
+}
+
+.dashboard-notification-item.dashboard-notification-priority-low {
+    border-left: 3px solid #10b981;
+}
+
+.dashboard-notification-item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    background: #f3f4f6;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.dashboard-notification-type-icon {
+    font-size: 1rem;
+    color: #6b7280;
+}
+
+.dashboard-notification-type-icon.dashboard-notification-approved {
+    color: #10b981;
+}
+
+.dashboard-notification-type-icon.dashboard-notification-rejected {
+    color: #ef4444;
+}
+
+.dashboard-notification-type-icon.dashboard-notification-pending {
+    color: #f59e0b;
+}
+
+.dashboard-notification-type-icon.dashboard-notification-cancelled {
+    color: #6b7280;
+}
+
+.dashboard-notification-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.dashboard-notification-item-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.dashboard-notification-item-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+    line-height: 1.25;
+}
+
+.dashboard-notification-item-time {
+    font-size: 0.75rem;
+    color: #6b7280;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.dashboard-notification-item-message {
+    font-size: 0.8125rem;
+    color: #4b5563;
+    line-height: 1.4;
+    margin: 0 0 0.5rem 0;
+}
+
+.dashboard-notification-item-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.dashboard-notification-detail {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.dashboard-notification-detail-icon {
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+.dashboard-notification-item-actions {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+.dashboard-notification-delete-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: transparent;
+    border: none;
+    border-radius: 0.25rem;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    opacity: 0;
+}
+
+.dashboard-notification-item:hover .dashboard-notification-delete-btn {
+    opacity: 1;
+}
+
+.dashboard-notification-delete-btn:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.dashboard-notification-arrow {
+    font-size: 0.875rem;
+    color: #d1d5db;
+    margin-top: 0.125rem;
+    transition: all 0.2s ease;
+}
+
+.dashboard-notification-item:hover .dashboard-notification-arrow {
+    color: #6b7280;
+    transform: translateX(2px);
+}
+
+.dashboard-notification-footer {
+    padding: 0.75rem 1.25rem;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+}
+
+.dashboard-notification-view-all-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.625rem;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dashboard-notification-view-all-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Charts Section */
+.charts-section {
+    margin-bottom: 2rem;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Content Grid */
+.content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .dashboard-dashboard-controls {
+        gap: 0.75rem;
+    }
+    
+    .dashboard-dropdown-button {
+        min-width: 100px;
+        font-size: 0.8rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .dashboard-calendar-input {
+        min-width: 120px;
+        font-size: 0.8rem;
+    }
+    
+    .dashboard-notification-button {
+        width: 2.25rem;
+        height: 2.25rem;
+    }
+    
+    .dashboard-notification-icon {
+        font-size: 1.125rem;
+    }
+    
+    .dashboard-notification-dropdown {
+        width: 350px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .dashboard-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .dashboard-dashboard-controls {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-notification-dropdown {
+        width: 320px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard {
+        padding: 1rem;
+    }
+    
+    .dashboard-dashboard-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    
+    .dashboard-control-item {
+        width: 100%;
+    }
+    
+    .dashboard-dropdown-button,
+    .dashboard-calendar-input {
+        width: 100%;
+        min-width: unset;
+    }
+    
+    .dashboard-notification-container {
+        align-self: center;
+    }
+    
+    .dashboard-notification-button {
+        width: 100%;
+        max-width: 2.5rem;
+        margin: 0 auto;
+    }
+    
+    .dashboard-notification-dropdown {
+        width: 300px;
+        right: -1rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-notification-item {
+        padding: 0.75rem 1rem;
+        gap: 0.5rem;
+    }
+    
+    .dashboard-notification-item-details {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-title {
+        font-size: 1.5rem;
+    }
+    
+    .dashboard-dashboard-controls {
+        padding: 0.5rem;
+    }
+    
+    .dashboard-dropdown-button,
+    .dashboard-calendar-input {
+        font-size: 0.875rem;
+        padding: 0.5rem;
+    }
+    
+    .dashboard-notification-button {
+        width: 2rem;
+        height: 2rem;
+    }
+    
+    .dashboard-notification-icon {
+        font-size: 1rem;
+    }
+    
+    .dashboard-notification-count {
+        min-width: 1rem;
+        height: 1rem;
+        font-size: 0.625rem;
+        top: -0.375rem;
+        right: -0.375rem;
+    }
+    
+    .dashboard-notification-dropdown {
+        width: 280px;
+        right: -2rem;
+    }
+    
+    .dashboard-notification-item {
+        padding: 0.5rem 0.75rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .dashboard-notification-item-icon {
+        align-self: flex-start;
+    }
+    
+    .dashboard-notification-item-actions {
+        align-self: flex-end;
+        margin-top: -1.5rem;
+    }
+}
+
+/* Focus management for dropdowns */
+.dashboard-dropdown-container:focus-within .dashboard-dropdown-button {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Ensure dropdowns appear above other content */
+.dashboard-dropdown-menu,
+.dashboard-notification-dropdown {
+    z-index: 1000;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+    transition: all 0.2s ease;
+}
+
+/* Custom scrollbar for dropdown menus */
+.dashboard-dropdown-menu::-webkit-scrollbar,
+.dashboard-notification-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.dashboard-dropdown-menu::-webkit-scrollbar-track,
+.dashboard-notification-content::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 2px;
+}
+
+.dashboard-dropdown-menu::-webkit-scrollbar-thumb,
+.dashboard-notification-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 2px;
+}
+
+.dashboard-dropdown-menu::-webkit-scrollbar-thumb:hover,
+.dashboard-notification-content::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
