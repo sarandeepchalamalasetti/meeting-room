@@ -18,7 +18,7 @@ jobs:
       - name: Show current directory (debug)
         run: pwd
 
-      - name: List root folder contents (debug)
+      - name: List folder contents (debug)
         run: dir
 
       - name: Set up Node.js version
