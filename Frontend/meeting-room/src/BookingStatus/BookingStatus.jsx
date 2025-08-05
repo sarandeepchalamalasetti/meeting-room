@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { toast } from 'react-toastify';
 import {
   MdBusiness,
   MdPeople,
@@ -170,23 +171,21 @@ const Avatar = ({ children, className = '' }) => (
   </div>
 );
 
-const showToast = (message) => {
-  // Simple toast implementation
-  const toast = document.createElement('div');
-  toast.className = 'bookingstatus-toast';
-  toast.textContent = message;
-  document.body.appendChild(toast);
-  
-  setTimeout(() => {
-    toast.classList.add('bookingstatus-toast-show');
-  }, 100);
-  
-  setTimeout(() => {
-    toast.classList.remove('bookingstatus-toast-show');
-    setTimeout(() => {
-      document.body.removeChild(toast);
-    }, 300);
-  }, 3000);
+// Utility function to get today's date in YYYY-MM-DD format
+const getTodayDate = () => {
+  const today = new Date();
+  return today.toISOString().split('T')[0];
+};
+
+// Utility function to format date
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  try {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  } catch (error) {
+    return dateString;
+  }
 };
 
 const BookingStatus = () => {
@@ -222,7 +221,7 @@ const BookingStatus = () => {
   const [editForm, setEditForm] = useState({});
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState(''); // Empty by default - will show today's bookings
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -235,7 +234,7 @@ const BookingStatus = () => {
       id: 1,
       _id: 'mock-1',
       roomName: "Executive Conference Room",
-      date: "2025-01-30",
+      date: getTodayDate(), // Use today's date
       time: "10:00 AM - 12:00 PM",
       startTime: "10:00",
       endTime: "12:00",
@@ -243,11 +242,11 @@ const BookingStatus = () => {
       managerEmail: "john.smith@company.com", 
       managerPhone: "+1 (555) 123-4567",
       status: "approved",
-      requestDate: "2025-01-28",
+      requestDate: getTodayDate(),
       purpose: "Client Presentation Meeting",
       attendees: 8,
       location: "Floor 5, Building A",
-      approvedDate: "2025-01-29",
+      approvedDate: getTodayDate(),
       description: "Important client presentation for Q1 budget approval.",
       equipment: ["Projector", "Whiteboard", "Conference Phone"],
       refreshments: true
@@ -256,16 +255,6 @@ const BookingStatus = () => {
 
   // Transform backend booking data to match UI format
   const transformBookingData = (backendBooking) => {
-    const formatDate = (dateString) => {
-      if (!dateString) return '';
-      try {
-        const date = new Date(dateString);
-        return date.toISOString().split('T')[0];
-      } catch (error) {
-        return dateString;
-      }
-    };
-
     const formatTime = (timeString) => {
       if (!timeString) return '';
       try {
@@ -316,7 +305,7 @@ const BookingStatus = () => {
         setBookings(fallbackBookings);
         setIsOnline(false);
         if (showToastMessage) {
-          showToast('Using offline data');
+          toast.info('Using offline data');
         }
         return;
       }
@@ -349,7 +338,7 @@ const BookingStatus = () => {
         setLastFetchTime(new Date());
         
         if (showToastMessage) {
-          showToast('Bookings refreshed successfully!');
+          toast.success('Bookings refreshed successfully!');
         }
       } else {
         throw new Error('Failed to fetch bookings');
@@ -361,7 +350,7 @@ const BookingStatus = () => {
       setIsOnline(false);
       
       if (showToastMessage) {
-        showToast('Failed to refresh. Using offline data.');
+        toast.error('Failed to refresh. Using offline data.');
       }
     } finally {
       setLoading(false);
@@ -373,14 +362,26 @@ const BookingStatus = () => {
     fetchUserBookings(true);
   };
 
-  // Filter bookings based on status, search, and date
+  // Updated filter function to show only today's bookings by default
   const filteredBookings = bookings.filter(booking => {
     const matchesStatus = filterStatus === 'all' || booking.status === filterStatus;
     const matchesSearch = booking.roomName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          booking.purpose.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          booking.manager.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDate = !selectedDate || booking.date === selectedDate;
+    
+    // Date filtering logic:
+    // If no date is selected, show only today's bookings
+    // If date is selected, show bookings for that specific date
+    const todayDate = getTodayDate();
+    const targetDate = selectedDate || todayDate;
+    const matchesDate = booking.date === targetDate;
+    
     return matchesStatus && matchesSearch && matchesDate;
+  }).sort((a, b) => {
+    // Sort by request date (newest first)
+    const dateA = new Date(a.requestDate || '1970-01-01');
+    const dateB = new Date(b.requestDate || '1970-01-01');
+    return dateB - dateA;
   });
 
   const handleViewBooking = (booking) => {
@@ -422,7 +423,7 @@ const BookingStatus = () => {
         setBookings(updatedBookings);
         setIsEditDialogOpen(false);
         setEditingBooking(null);
-        showToast("Booking updated successfully! Resubmitted for approval.");
+        toast.success("Booking updated successfully! Resubmitted for approval.");
         return;
       }
 
@@ -454,7 +455,7 @@ const BookingStatus = () => {
         
         // Refresh bookings
         await fetchUserBookings();
-        showToast("Booking updated successfully! Resubmitted for approval.");
+        toast.success("Booking updated successfully! Resubmitted for approval.");
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to update booking');
@@ -462,7 +463,7 @@ const BookingStatus = () => {
       
     } catch (error) {
       console.error('❌ Failed to update booking:', error);
-      showToast(error.message || 'Failed to update booking. Please try again.');
+      toast.error(error.message || 'Failed to update booking. Please try again.');
     } finally {
       setLoading(false);
       setIsEditDialogOpen(false);
@@ -482,7 +483,7 @@ const BookingStatus = () => {
             : booking
         );
         setBookings(updatedBookings);
-        showToast("Booking cancelled successfully!");
+        toast.success("Booking cancelled successfully!");
         return;
       }
 
@@ -500,7 +501,7 @@ const BookingStatus = () => {
       if (response.ok) {
         console.log('✅ Booking cancelled');
         await fetchUserBookings();
-        showToast("Booking cancelled successfully!");
+        toast.success("Booking cancelled successfully!");
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to cancel booking');
@@ -508,7 +509,7 @@ const BookingStatus = () => {
       
     } catch (error) {
       console.error('❌ Failed to cancel booking:', error);
-      showToast(error.message || 'Failed to cancel booking. Please try again.');
+      toast.error(error.message || 'Failed to cancel booking. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -528,13 +529,22 @@ const BookingStatus = () => {
     return () => clearInterval(interval);
   }, [fetchUserBookings]);
 
+  // Get display date for header
+  const getDisplayDateText = () => {
+    if (selectedDate) {
+      const selectedDateObj = new Date(selectedDate);
+      return `for ${selectedDateObj.toLocaleDateString()}`;
+    }
+    return 'for Today';
+  };
+
   return (
     <div className="bookingstatus-booking-status-container">
       <div className="bookingstatus-booking-status-wrapper">
         {/* Enhanced Header */}
         <div className="bookingstatus-header-section">
           <div className="bookingstatus-header-content">
-            <h1 className="bookingstatus-main-title">My Booking Status</h1>
+            <h1 className="bookingstatus-main-title">My Booking Status {getDisplayDateText()}</h1>
             <p className="bookingstatus-main-subtitle">
               Track and manage your room booking requests with ease
               {!isOnline && ' (Offline mode - data may not be current)'}
@@ -578,7 +588,7 @@ const BookingStatus = () => {
                 <button
                   onClick={() => setSelectedDate('')}
                   className="bookingstatus-clear-date-btn"
-                  title="Clear date filter"
+                  title="Clear date filter (show today)"
                 >
                   <MdClose />
                 </button>
@@ -615,7 +625,7 @@ const BookingStatus = () => {
               {/* Line 2: Number and Calendar icon */}
               <div className="bookingstatus-stats-row-between">
                 <h3 className="bookingstatus-stats-value" style={{ color: '#2563eb', margin: 0 }}>
-                  {loading ? '...' : bookings.length}
+                  {loading ? '...' : filteredBookings.length}
                 </h3>
                 <div className="bookingstatus-stats-icon-container bookingstatus-stats-icon-primary">
                   <MdCalendarToday className="bookingstatus-stats-icon" />
@@ -626,7 +636,7 @@ const BookingStatus = () => {
               <div className="bookingstatus-stats-change">
                 <MdTrendingUp className="bookingstatus-trend-icon bookingstatus-trend-up" />
                 <span className="bookingstatus-trend-text bookingstatus-trend-positive">
-                  {selectedDate ? `On ${selectedDate}` : 'All your requests'}
+                  {selectedDate ? `On ${selectedDate}` : 'Today\'s requests'}
                 </span>
               </div>
             </div>
@@ -800,18 +810,6 @@ const BookingStatus = () => {
                             <MdVisibility className="bookingstatus-btn-icon" />
                             View Details
                           </Button>
-                          {booking.status === 'pending' && (
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleEditBooking(booking)}
-                              className="bookingstatus-edit-btn"
-                              disabled={loading}
-                            >
-                              <MdEdit className="bookingstatus-btn-icon" />
-                              Edit
-                            </Button>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -833,7 +831,9 @@ const BookingStatus = () => {
               <p className="bookingstatus-no-results-text">
                 {searchTerm || filterStatus !== 'all' || selectedDate
                   ? 'Try adjusting your search, filter criteria, or date to find what you\'re looking for.'
-                  : 'You haven\'t made any booking requests yet. Start by creating your first booking.'
+                  : selectedDate
+                    ? `You don't have any booking requests for ${selectedDate}. Try selecting a different date.`
+                    : 'You don\'t have any booking requests for today. Start by creating your first booking.'
                 }
               </p>
               {(searchTerm || filterStatus !== 'all' || selectedDate) && (
@@ -1003,51 +1003,6 @@ const BookingStatus = () => {
                   <p className="bookingstatus-rejection-reason-text">{selectedBooking.rejectionReason}</p>
                 </div>
               )}
-
-              {/* Actions */}
-              <div className="bookingstatus-view-actions">
-                <div className="bookingstatus-primary-actions">
-                  <Button className="bookingstatus-contact-btn">
-                    <MdMessage className="bookingstatus-btn-icon" />
-                    Contact Manager
-                  </Button>
-                  {selectedBooking.status === 'pending' && (
-                    <>
-                      <Button 
-                        variant="outline"
-                        onClick={() => {
-                          setIsViewDialogOpen(false);
-                          handleEditBooking(selectedBooking);
-                        }}
-                        className="bookingstatus-edit-request-btn"
-                        disabled={loading}
-                      >
-                        <MdEdit className="bookingstatus-btn-icon" />
-                        Edit Request
-                      </Button>
-                      <Button 
-                        variant="outline"
-                        onClick={() => handleCancelBooking(selectedBooking.id)}
-                        className="bookingstatus-cancel-btn"
-                        disabled={loading}
-                      >
-                        <MdClose className="bookingstatus-btn-icon" />
-                        Cancel
-                      </Button>
-                    </>
-                  )}
-                </div>
-                <div className="bookingstatus-secondary-actions">
-                  <Button variant="ghost" size="sm" className="bookingstatus-copy-btn">
-                    <MdContentCopy className="bookingstatus-btn-icon" />
-                    Copy
-                  </Button>
-                  <Button variant="ghost" size="sm" className="bookingstatus-share-btn">
-                    <MdOpenInNew className="bookingstatus-btn-icon" />
-                    Share
-                  </Button>
-                </div>
-              </div>
             </div>
           )}
         </Modal>

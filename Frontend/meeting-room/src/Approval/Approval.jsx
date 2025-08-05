@@ -99,79 +99,6 @@ const Input = ({ className = "", type = "text", ...props }) => (
   />
 );
 
-// Custom Select Components
-const Select = ({ children, value, onValueChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleValueChange = (newValue) => {
-    onValueChange(newValue);
-    setIsOpen(false);
-  };
-
-  return (
-    <div className="approve-select">
-      {React.Children.map(children, child => {
-        if (child.type?.name === 'SelectTrigger') {
-          return React.cloneElement(child, { 
-            isOpen, 
-            setIsOpen,
-            onClick: () => setIsOpen(!isOpen)
-          });
-        }
-        if (child.type?.name === 'SelectContent') {
-          return React.cloneElement(child, { 
-            isOpen, 
-            value,
-            handleValueChange 
-          });
-        }
-        return child;
-      })}
-    </div>
-  );
-};
-
-const SelectTrigger = ({ children, className = "", isOpen, setIsOpen, onClick, ...props }) => (
-  <button
-    type="button"
-    className={`approve-select-trigger ${className}`}
-    onClick={onClick}
-    {...props}
-  >
-    {children}
-    {isOpen ? (
-      <FaChevronUp className="approve-select-arrow" />
-    ) : (
-      <FaChevronDown className="approve-select-arrow" />
-    )}
-  </button>
-);
-
-const SelectValue = ({ placeholder, children }) => (
-  <span>{children || placeholder}</span>
-);
-
-const SelectContent = ({ children, isOpen, value, handleValueChange }) => {
-  if (!isOpen) return null;
-  
-  return (
-    <div className="approve-select-content">
-      {React.Children.map(children, child =>
-        React.cloneElement(child, { value, handleValueChange })
-      )}
-    </div>
-  );
-};
-
-const SelectItem = ({ children, value, handleValueChange }) => (
-  <div
-    className="approve-select-item"
-    onClick={() => handleValueChange(value)}
-  >
-    {children}
-  </div>
-);
-
 // Custom Separator Component
 const Separator = ({ className = "", ...props }) => (
   <div className={`approve-separator ${className}`} {...props} />
@@ -203,57 +130,21 @@ export default function Approval() {
   const user = getUserData();
   const token = sessionStorage.getItem('token');
 
+  // Get today's date in YYYY-MM-DD format
+  const getTodayDate = () => {
+    return new Date().toISOString().split('T')[0];
+  };
+
   // State management
   const [bookings, setBookings] = useState([]);
   const [activeTab, setActiveTab] = useState("pending");
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterDepartment, setFilterDepartment] = useState("all");
-  const [filterUrgency, setFilterUrgency] = useState("all");
+  const [selectedDate, setSelectedDate] = useState(getTodayDate());
+  const [showAllDates, setShowAllDates] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
-
-  // Mock data fallback for offline mode
-  const fallbackBookings = [
-    {
-      id: 1,
-      _id: 'mock-1',
-      requester: { 
-        name: "Sarah Johnson", 
-        email: "sarah.j@company.com", 
-        avatar: "/api/placeholder/32/32", 
-        department: "Marketing", 
-        role: "Marketing Manager", 
-        phone: "+1 (555) 0123" 
-      },
-      room: "Conference Room A",
-      roomName: "Conference Room A",
-      date: "2025-01-25",
-      time: "09:00 - 11:00",
-      startTime: "09:00",
-      endTime: "11:00",
-      purpose: "Q1 Marketing Strategy Meeting",
-      description: "Comprehensive review of Q1 marketing initiatives, budget allocation, and campaign planning for the upcoming quarter.",
-      attendees: 8,
-      priority: "high",
-      status: "pending",
-      equipment: ["Projector", "Whiteboard", "Video Conferencing", "Sound System"],
-      submittedAt: "2025-01-22 14:30",
-      urgency: "urgent",
-      score: 85,
-      estimatedCost: "$150",
-      approvedBy: null,
-      approvedAt: null,
-      notes: "",
-      attachments: ["meeting-agenda.pdf", "budget-proposal.xlsx"],
-      managerId: user.employeeId || user.id,
-      managerInfo: {
-        name: user.name,
-        email: user.email,
-        employeeId: user.employeeId || user.id
-      }
-    }
-  ];
+  const [lastClearDate, setLastClearDate] = useState(getTodayDate());
 
   // Transform backend booking data to match UI format
   const transformBookingData = (backendBooking) => {
@@ -287,7 +178,8 @@ export default function Approval() {
       approvedBy: backendBooking.approvedBy,
       approvedAt: formatDateTime(backendBooking.approvedAt),
       notes: backendBooking.notes || '',
-      attachments: backendBooking.attachments || []
+      attachments: backendBooking.attachments || [],
+      createdAt: backendBooking.createdAt || backendBooking.submittedAt
     };
   };
 
@@ -309,13 +201,38 @@ export default function Approval() {
     }
   };
 
+  // Sort bookings with latest on top
+  const sortBookingsByLatest = (bookingsArray) => {
+    return bookingsArray.sort((a, b) => {
+      const dateA = new Date(a.createdAt || a.submittedAt);
+      const dateB = new Date(b.createdAt || b.submittedAt);
+      return dateB - dateA; // Latest first
+    });
+  };
+
+  // Check if it's past midnight and clear data if needed
+  const checkAndClearMidnightData = () => {
+    const currentDate = getTodayDate();
+    const storedClearDate = localStorage.getItem('lastClearDate');
+    
+    if (!storedClearDate || storedClearDate !== currentDate) {
+      // It's a new day, clear the bookings data
+      setBookings([]);
+      localStorage.setItem('lastClearDate', currentDate);
+      setLastClearDate(currentDate);
+      console.log('🌙 Midnight data clear - New day started');
+    }
+  };
+
   // Fetch bookings that need approval for current manager
   const fetchBookings = useCallback(async (showToast = false) => {
     try {
       setLoading(true);
       
+      // Check for midnight data clearing first
+      checkAndClearMidnightData();
+      
       if (!token || !isOnline) {
-        setBookings(fallbackBookings);
         setIsOnline(false);
         return;
       }
@@ -332,8 +249,8 @@ export default function Approval() {
         const bookingsData = await response.json();
         console.log('✅ Fetched approval requests:', bookingsData);
         
-        // Transform backend data to UI format
-        const transformedBookings = bookingsData.map(transformBookingData);
+        // Transform backend data to UI format and sort by latest
+        const transformedBookings = sortBookingsByLatest(bookingsData.map(transformBookingData));
         setBookings(transformedBookings);
         setIsOnline(true);
       } else {
@@ -342,7 +259,6 @@ export default function Approval() {
       
     } catch (error) {
       console.error('❌ Failed to fetch approval requests:', error);
-      setBookings(fallbackBookings);
       setIsOnline(false);
     } finally {
       setLoading(false);
@@ -356,16 +272,19 @@ export default function Approval() {
       
       if (!token || !isOnline) {
         // Mock approval for offline mode
-        setBookings(prev => prev.map(booking => 
-          booking.id === bookingId 
-            ? { 
-                ...booking, 
-                status: 'approved', 
-                approvedBy: user.name,
-                approvedAt: formatDateTime(new Date().toISOString())
-              }
-            : booking
-        ));
+        setBookings(prev => {
+          const updated = prev.map(booking => 
+            booking.id === bookingId 
+              ? { 
+                  ...booking, 
+                  status: 'approved', 
+                  approvedBy: user.name,
+                  approvedAt: formatDateTime(new Date().toISOString())
+                }
+              : booking
+          );
+          return sortBookingsByLatest(updated);
+        });
         
         if (selectedBooking && selectedBooking.id === bookingId) {
           setSelectedBooking(prev => ({
@@ -399,11 +318,14 @@ export default function Approval() {
         const updatedBooking = await response.json();
         console.log('✅ Booking approved:', updatedBooking);
         
-        // Transform and update local state
+        // Transform and update local state with sorting
         const transformedBooking = transformBookingData(updatedBooking);
-        setBookings(prev => prev.map(booking => 
-          booking.id === bookingId ? transformedBooking : booking
-        ));
+        setBookings(prev => {
+          const updated = prev.map(booking => 
+            booking.id === bookingId ? transformedBooking : booking
+          );
+          return sortBookingsByLatest(updated);
+        });
         
         if (selectedBooking && selectedBooking.id === bookingId) {
           setSelectedBooking(transformedBooking);
@@ -435,17 +357,20 @@ export default function Approval() {
       
       if (!token || !isOnline) {
         // Mock rejection for offline mode
-        setBookings(prev => prev.map(booking => 
-          booking.id === bookingId 
-            ? { 
-                ...booking, 
-                status: 'rejected', 
-                approvedBy: user.name,
-                approvedAt: formatDateTime(new Date().toISOString()),
-                notes: reason
-              }
-            : booking
-        ));
+        setBookings(prev => {
+          const updated = prev.map(booking => 
+            booking.id === bookingId 
+              ? { 
+                  ...booking, 
+                  status: 'rejected', 
+                  approvedBy: user.name,
+                  approvedAt: formatDateTime(new Date().toISOString()),
+                  notes: reason
+                }
+              : booking
+          );
+          return sortBookingsByLatest(updated);
+        });
         
         if (selectedBooking && selectedBooking.id === bookingId) {
           setSelectedBooking(prev => ({
@@ -480,11 +405,14 @@ export default function Approval() {
         const updatedBooking = await response.json();
         console.log('❌ Booking rejected:', updatedBooking);
         
-        // Transform and update local state
+        // Transform and update local state with sorting
         const transformedBooking = transformBookingData(updatedBooking);
-        setBookings(prev => prev.map(booking => 
-          booking.id === bookingId ? transformedBooking : booking
-        ));
+        setBookings(prev => {
+          const updated = prev.map(booking => 
+            booking.id === bookingId ? transformedBooking : booking
+          );
+          return sortBookingsByLatest(updated);
+        });
         
         if (selectedBooking && selectedBooking.id === bookingId) {
           setSelectedBooking(transformedBooking);
@@ -509,37 +437,46 @@ export default function Approval() {
     }
   };
 
-  // Get bookings by status
+  // Get bookings by status and date filter
   const getBookingsByStatus = (status) => {
-    if (status === 'all') return bookings;
-    if (status === 'completed') return bookings.filter(b => b.status === 'approved');
-    return bookings.filter(b => b.status === status);
+    let filteredBookings = bookings;
+    
+    // Filter by date if not showing all dates
+    if (!showAllDates && selectedDate) {
+      filteredBookings = bookings.filter(b => b.date === selectedDate);
+    }
+    
+    // Filter by status
+    if (status === 'all') return filteredBookings;
+    if (status === 'completed') return filteredBookings.filter(b => b.status === 'approved');
+    return filteredBookings.filter(b => b.status === status);
   };
 
-  // Get tab counts
-  const getTabCounts = () => ({
-    pending: bookings.filter(b => b.status === 'pending').length,
-    approved: bookings.filter(b => b.status === 'approved').length,
-    rejected: bookings.filter(b => b.status === 'rejected').length,
-    completed: bookings.filter(b => b.status === 'approved').length,
-    all: bookings.length
-  });
+  // Get tab counts with date filtering
+  const getTabCounts = () => {
+    const dateFilteredBookings = !showAllDates && selectedDate 
+      ? bookings.filter(b => b.date === selectedDate) 
+      : bookings;
+      
+    return {
+      pending: dateFilteredBookings.filter(b => b.status === 'pending').length,
+      approved: dateFilteredBookings.filter(b => b.status === 'approved').length,
+      rejected: dateFilteredBookings.filter(b => b.status === 'rejected').length,
+      completed: dateFilteredBookings.filter(b => b.status === 'approved').length,
+      all: dateFilteredBookings.length
+    };
+  };
 
   const tabCounts = getTabCounts();
 
-  // Filter bookings based on search and filters
+  // Filter bookings based on search
   const filteredBookings = getBookingsByStatus(activeTab).filter(booking => {
     const matchesSearch = booking.room.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          booking.requester.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          booking.purpose.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDepartment = filterDepartment === "all" || booking.requester.department === filterDepartment;
-    const matchesUrgency = filterUrgency === "all" || booking.urgency === filterUrgency;
     
-    return matchesSearch && matchesDepartment && matchesUrgency;
+    return matchesSearch;
   });
-
-  // Get unique departments from bookings
-  const departments = [...new Set(bookings.map(b => b.requester.department))];
 
   // Enhanced Tab Configuration with Icons and Gradients
   const tabConfig = [
@@ -575,19 +512,57 @@ export default function Approval() {
     }
   ];
 
+  // Handle date change
+  const handleDateChange = (event) => {
+    const newDate = event.target.value;
+    setSelectedDate(newDate);
+    setShowAllDates(false);
+  };
+
+  // Handle show all dates
+  const handleShowAllDates = () => {
+    setShowAllDates(true);
+    setSelectedDate('');
+  };
+
+  // Format date for display
+  const formatDateForDisplay = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return dateString;
+    }
+  };
+
   // Fetch bookings on component mount
   useEffect(() => {
     fetchBookings();
   }, [fetchBookings]);
 
-  // Auto-refresh every 30 seconds
+  // Auto-refresh every 30 seconds and check for midnight
   useEffect(() => {
     const interval = setInterval(() => {
+      checkAndClearMidnightData();
       fetchBookings();
     }, 30000);
 
     return () => clearInterval(interval);
   }, [fetchBookings]);
+
+  // Check for midnight every minute
+  useEffect(() => {
+    const midnightInterval = setInterval(() => {
+      checkAndClearMidnightData();
+    }, 60000); // Check every minute
+
+    return () => clearInterval(midnightInterval);
+  }, []);
 
   return (
     <div className="approve-container">
@@ -631,7 +606,7 @@ export default function Approval() {
           })}
         </div>
 
-        {/* Search and Filters */}
+        {/* Search and Date Filter */}
         <div className="approve-search-filters">
           <div className="approve-search-container">
             <FaSearch className="approve-search-icon" />
@@ -642,33 +617,33 @@ export default function Approval() {
               className="approve-search-input"
             />
           </div>
-          <Select value={filterDepartment} onValueChange={setFilterDepartment}>
-            <SelectTrigger className="approve-filter-select">
-              <SelectValue placeholder="All Departments">
-                {filterDepartment === "all" ? "All Departments" : filterDepartment}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Departments</SelectItem>
-              {departments.map(dept => (
-                <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={filterUrgency} onValueChange={setFilterUrgency}>
-            <SelectTrigger className="approve-filter-urgency">
-              <SelectValue placeholder="All Urgency">
-                {filterUrgency === "all" ? "All Urgency" : filterUrgency}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Urgency</SelectItem>
-              <SelectItem value="urgent">Urgent</SelectItem>
-              <SelectItem value="high">High</SelectItem>
-              <SelectItem value="normal">Normal</SelectItem>
-              <SelectItem value="low">Low</SelectItem>
-            </SelectContent>
-          </Select>
+          
+          {/* Date Filter */}
+          <div className="approve-date-filter">
+            <Input
+              type="date"
+              value={selectedDate}
+              onChange={handleDateChange}
+              className="approve-date-input"
+              max="2099-12-31"
+            />
+            <Button 
+              variant={showAllDates ? "default" : "outline"} 
+              size="sm"
+              onClick={handleShowAllDates}
+              className="approve-all-dates-btn"
+            >
+              <FaCalendarAlt className="approve-calendar-icon" />
+              All Dates
+            </Button>
+          </div>
+          
+          {/* Current Filter Display */}
+          <div className="approve-filter-display">
+            <span className="approve-filter-text">
+              {showAllDates ? 'Showing: All Dates' : `Showing: ${formatDateForDisplay(selectedDate) || 'Today'}`}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -786,8 +761,8 @@ export default function Approval() {
                   </p>
                   <Button variant="outline" className="approve-clear-filters" onClick={() => {
                     setSearchTerm("");
-                    setFilterDepartment("all");
-                    setFilterUrgency("all");
+                    setSelectedDate(getTodayDate());
+                    setShowAllDates(false);
                   }}>
                     Clear Filters
                   </Button>

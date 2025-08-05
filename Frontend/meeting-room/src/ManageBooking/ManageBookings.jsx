@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './ManageBookings.css';
-import EditBookingModal from './EditBookingModal/EditBookingModal'; // Fixed: Removed .jsx extension
+import EditBookingModal from './EditBookingModal/EditBookingModal';
 import { 
   FaCalendarAlt, 
   FaClock, 
@@ -16,6 +16,7 @@ import {
 } from 'react-icons/fa';
 
 const ManageBookings = () => {
+  const [allBookings, setAllBookings] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [filteredBookings, setFilteredBookings] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -47,7 +48,63 @@ const ManageBookings = () => {
   const user = getUserData();
   const token = sessionStorage.getItem('token');
 
+  // Helper function to get today's date in the same format as bookings
+  const getTodayDateString = () => {
+    const today = new Date();
+    return today.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    }).replace(/,/g, '');
+  };
 
+  // Helper function to check if a date string is today or future
+  const isDateTodayOrFuture = (dateString) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of day for comparison
+    
+    try {
+      // Parse the date string (format: "DD MMM YYYY")
+      const parts = dateString.split(' ');
+      if (parts.length !== 3) return false;
+      
+      const day = parseInt(parts[0]);
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const month = monthNames.indexOf(parts[1]);
+      const year = parseInt(parts[2]);
+      
+      if (month === -1) return false;
+      
+      const bookingDate = new Date(year, month, day);
+      bookingDate.setHours(0, 0, 0, 0);
+      
+      return bookingDate >= today;
+    } catch (error) {
+      console.error('Error parsing date:', dateString, error);
+      return false;
+    }
+  };
+
+  // Helper function to check if a date string is today
+  const isDateToday = (dateString) => {
+    const todayString = getTodayDateString();
+    return dateString === todayString;
+  };
+
+  // Filter bookings to show only today's by default, or all current/future if filter is applied
+  const filterBookingsByDate = (bookingsList, hasDateFilter = false) => {
+    if (hasDateFilter && selectedDate) {
+      // If a specific date is selected, show all bookings for that date (even past dates)
+      return bookingsList;
+    } else if (hasDateFilter) {
+      // If date filter is applied but no specific date selected, show all current/future bookings
+      return bookingsList.filter(booking => isDateTodayOrFuture(booking.date));
+    } else {
+      // Default: show only today's bookings
+      return bookingsList.filter(booking => isDateToday(booking.date));
+    }
+  };
 
   // Fetch user's bookings from backend
   const fetchBookings = async (showRefreshMessage = false) => {
@@ -65,12 +122,12 @@ const ManageBookings = () => {
       
       if (!token) {
         setError('Please login to view your bookings');
+        setAllBookings([]);
         setBookings([]);
         setFilteredBookings([]);
         return;
       }
 
-      // Try the manage endpoint first - your backend has this endpoint
       const response = await axios.get(`${API_BASE_URL}/bookings/manage`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -81,9 +138,13 @@ const ManageBookings = () => {
 
       console.log('📋 Raw bookings response:', response.data);
       
-      // The backend already transforms the data, so use it directly
-      setBookings(response.data);
-      setFilteredBookings(response.data);
+      // Store all bookings (including past ones)
+      setAllBookings(response.data);
+      
+      // Filter to show only today's bookings by default
+      const filteredData = filterBookingsByDate(response.data, false);
+      setBookings(filteredData);
+      setFilteredBookings(filteredData);
       
       if (showRefreshMessage) {
         console.log('✅ Bookings refreshed successfully');
@@ -102,6 +163,7 @@ const ManageBookings = () => {
         setError('Failed to load bookings. Please try again.');
       }
       
+      setAllBookings([]);
       setBookings([]);
       setFilteredBookings([]);
     } finally {
@@ -109,6 +171,38 @@ const ManageBookings = () => {
       setRefreshing(false);
     }
   };
+
+  // Setup midnight cleanup
+  useEffect(() => {
+    const setupMidnightCleanup = () => {
+      const now = new Date();
+      const midnight = new Date();
+      midnight.setHours(24, 0, 0, 0); // Next midnight
+      
+      const timeUntilMidnight = midnight.getTime() - now.getTime();
+      
+      // Set timeout for next midnight
+      const timeoutId = setTimeout(() => {
+        console.log('🕛 Midnight cleanup triggered');
+        
+        // Refresh bookings to get updated data and apply new date filters
+        if (token) {
+          fetchBookings();
+        }
+        
+        // Setup next day's cleanup
+        setupMidnightCleanup();
+      }, timeUntilMidnight);
+      
+      return timeoutId;
+    };
+    
+    const timeoutId = setupMidnightCleanup();
+    
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [token]);
 
   // Cancel booking
   const handleCancelBooking = async (bookingId, reason = '') => {
@@ -123,7 +217,6 @@ const ManageBookings = () => {
 
       console.log('❌ Cancelling booking:', bookingId);
 
-      // Use the cancel endpoint that exists in your backend
       await axios.patch(`${API_BASE_URL}/bookings/${bookingId}/cancel`, {
         reason: reason
       }, {
@@ -177,7 +270,19 @@ const ManageBookings = () => {
 
   // Filter bookings based on search and filters
   useEffect(() => {
-    let filtered = [...bookings];
+    // Determine which bookings to start with based on filter state
+    const hasDateFilter = selectedDate !== null;
+    let baseBookings;
+    
+    if (hasDateFilter) {
+      // If date filter is applied, use all bookings and filter by date
+      baseBookings = filterBookingsByDate(allBookings, true);
+    } else {
+      // Default: use current bookings (which are already filtered to today's)
+      baseBookings = bookings;
+    }
+    
+    let filtered = [...baseBookings];
 
     // Search filter
     if (searchQuery) {
@@ -205,7 +310,14 @@ const ManageBookings = () => {
     }
 
     setFilteredBookings(filtered);
-  }, [bookings, searchQuery, selectedDate, activeTab]);
+  }, [allBookings, bookings, searchQuery, selectedDate, activeTab]);
+
+  // Update bookings when date filter changes
+  useEffect(() => {
+    const hasDateFilter = selectedDate !== null;
+    const newBookings = filterBookingsByDate(allBookings, hasDateFilter);
+    setBookings(newBookings);
+  }, [allBookings, selectedDate]);
 
   // Fetch bookings on component mount
   useEffect(() => {
@@ -417,7 +529,10 @@ const ManageBookings = () => {
           <div className="managebookings-header-text">
             <h1 className="managebookings-main-title">Manage Bookings</h1>
             <p className="managebookings-subtitle">
-              View and manage your meeting room bookings
+              {selectedDate ? 
+                `Bookings for ${selectedDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/,/g, '')}` :
+                `Today's bookings (${getTodayDateString()})`
+              }
               {user && ` - ${user.name || user.username || 'User'}`}
             </p>
           </div>
@@ -537,7 +652,7 @@ const ManageBookings = () => {
             <div className="managebookings-empty-state">
               <p className="managebookings-empty-message">
                 No {activeTab === 'all' ? '' : activeTab} bookings found
-                {selectedDate && ' for the selected date'}.
+                {selectedDate ? ' for the selected date' : ' for today'}.
               </p>
             </div>
           )}

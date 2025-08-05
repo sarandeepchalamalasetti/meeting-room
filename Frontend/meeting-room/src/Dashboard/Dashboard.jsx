@@ -38,12 +38,12 @@ const Dashboard = () => {
     hasToken: !!token
   });
   
-  // State for dropdown controls
+  // ✅ FIXED: State for dropdown controls with midnight reset
   const [selectedPeriod, setSelectedPeriod] = useState('Today');
   const [selectedDate, setSelectedDate] = useState('');
   const [showPeriodDropdown, setShowPeriodDropdown] = useState(false);
 
-  // ✅ NEW: Active filter state management
+  // ✅ FIXED: Active filter state management - both filters work independently
   const [activeFilter, setActiveFilter] = useState('period'); // 'period' or 'date'
   const [filterDateRange, setFilterDateRange] = useState({
     startDate: '',
@@ -67,61 +67,86 @@ const Dashboard = () => {
     '1 Year'
   ];
 
-  // ✅ NEW: Calculate date range based on selected period
-  const calculateDateRange = (period) => {
+  // ✅ FIXED: Helper function to get current date in YYYY-MM-DD format without timezone issues
+  const getCurrentDateString = () => {
     const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // ✅ FIXED: Helper function to add days to a date string
+  const addDaysToDateString = (dateString, days) => {
+    const date = new Date(dateString + 'T00:00:00'); // Ensure local timezone
+    date.setDate(date.getDate() + days);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // ✅ FIXED: Calculate date range based on selected period with proper timezone handling
+  const calculateDateRange = (period) => {
+    const todayString = getCurrentDateString();
     let startDate, endDate;
+
+    console.log('📅 Calculating date range for period:', period, 'Today is:', todayString);
 
     switch (period) {
       case 'Today':
-        startDate = new Date(today);
-        endDate = new Date(today);
-        endDate.setDate(endDate.getDate() + 1); // Include full day
+        startDate = todayString;
+        endDate = addDaysToDateString(todayString, 1); // Next day for range query
         break;
       case 'This Week':
-        const dayOfWeek = today.getDay();
-        startDate = new Date(today);
-        startDate.setDate(today.getDate() - dayOfWeek); // Start of week (Sunday)
-        endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + 7);
+        const now = new Date();
+        const dayOfWeek = now.getDay();
+        const startOfWeek = addDaysToDateString(todayString, -dayOfWeek); // Start of week (Sunday)
+        startDate = startOfWeek;
+        endDate = addDaysToDateString(startOfWeek, 7);
         break;
       case 'This Month':
-        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-        endDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+        const currentDate = new Date();
+        const firstOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const lastOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+        
+        startDate = firstOfMonth.toISOString().split('T')[0];
+        endDate = lastOfMonth.toISOString().split('T')[0];
         break;
       case '3 Months':
-        startDate = new Date(today);
-        startDate.setMonth(today.getMonth() - 3);
-        endDate = new Date(today);
-        endDate.setDate(endDate.getDate() + 1);
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+        startDate = threeMonthsAgo.toISOString().split('T')[0];
+        endDate = addDaysToDateString(todayString, 1);
         break;
       case '6 Months':
-        startDate = new Date(today);
-        startDate.setMonth(today.getMonth() - 6);
-        endDate = new Date(today);
-        endDate.setDate(endDate.getDate() + 1);
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+        startDate = sixMonthsAgo.toISOString().split('T')[0];
+        endDate = addDaysToDateString(todayString, 1);
         break;
       case '1 Year':
-        startDate = new Date(today);
-        startDate.setFullYear(today.getFullYear() - 1);
-        endDate = new Date(today);
-        endDate.setDate(endDate.getDate() + 1);
+        const oneYearAgo = new Date();
+        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+        startDate = oneYearAgo.toISOString().split('T')[0];
+        endDate = addDaysToDateString(todayString, 1);
         break;
       default:
-        startDate = new Date(today);
-        endDate = new Date(today);
-        endDate.setDate(endDate.getDate() + 1);
+        startDate = todayString;
+        endDate = addDaysToDateString(todayString, 1);
     }
 
-    return {
-      startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0],
+    const result = {
+      startDate: startDate,
+      endDate: endDate,
       type: period.toLowerCase().replace(' ', '_')
     };
+
+    console.log('📅 Date range calculated:', result);
+    return result;
   };
 
-  // ✅ NEW: Midnight reset functionality
+  // ✅ ENHANCED: Midnight reset functionality with proper "Today" reset
   useEffect(() => {
     const checkMidnight = () => {
       const now = new Date();
@@ -131,12 +156,21 @@ const Dashboard = () => {
       const timeUntilMidnight = midnight.getTime() - now.getTime();
       
       const timeout = setTimeout(() => {
-        console.log('🕛 Midnight reset triggered');
-        // Force refresh all components by updating filter
-        setFilterDateRange(prevRange => ({
-          ...prevRange,
+        console.log('🕛 Midnight reset triggered - resetting to Today filter');
+        
+        // ✅ FIXED: Reset dropdown to "Today" and clear date filter
+        setSelectedPeriod('Today');
+        setSelectedDate('');
+        setActiveFilter('period');
+        
+        // Update filter range to today
+        const todayRange = calculateDateRange('Today');
+        setFilterDateRange({
+          ...todayRange,
           lastReset: new Date().toISOString()
-        }));
+        });
+        
+        console.log('✅ Midnight reset complete - filters reset to Today');
         
         // Set up next midnight check
         checkMidnight();
@@ -149,7 +183,7 @@ const Dashboard = () => {
     return cleanup;
   }, []);
 
-  // ✅ NEW: Update filter when period changes
+  // ✅ FIXED: Update filter when period changes (remove activeFilter restriction)
   useEffect(() => {
     if (activeFilter === 'period') {
       const newRange = calculateDateRange(selectedPeriod);
@@ -158,22 +192,28 @@ const Dashboard = () => {
     }
   }, [selectedPeriod, activeFilter]);
 
-  // ✅ NEW: Update filter when specific date changes
+  // ✅ FIXED: Update filter when specific date changes
   useEffect(() => {
     if (activeFilter === 'date' && selectedDate) {
-      const dateObj = new Date(selectedDate);
-      const nextDay = new Date(dateObj);
-      nextDay.setDate(nextDay.getDate() + 1);
+      const nextDay = addDaysToDateString(selectedDate, 1);
       
       const newRange = {
         startDate: selectedDate,
-        endDate: nextDay.toISOString().split('T')[0],
+        endDate: nextDay,
         type: 'custom_date'
       };
       setFilterDateRange(newRange);
       console.log('📅 Date filter updated:', selectedDate, newRange);
     }
   }, [selectedDate, activeFilter]);
+
+  // ✅ Initialize filter on component mount
+  useEffect(() => {
+    // Set initial filter to today
+    const todayRange = calculateDateRange('Today');
+    setFilterDateRange(todayRange);
+    console.log('📅 Initial filter set to Today:', todayRange);
+  }, []);
 
   // Existing notification functions (unchanged)
   const fetchNotifications = async () => {
@@ -376,35 +416,41 @@ const Dashboard = () => {
     };
   }, [token]);
 
-  // ✅ NEW: Handle period selection with filter priority
+  // ✅ FIXED: Handle period selection with proper filter management
   const handlePeriodSelect = (period) => {
+    console.log('📅 Period selected:', period);
     setSelectedPeriod(period);
     setShowPeriodDropdown(false);
     
-    // Set period filter as active and clear date
+    // ✅ FIXED: Set period filter as active and clear date (both filters work independently)
     setActiveFilter('period');
     setSelectedDate('');
     
-    console.log('📅 Period selected:', period, 'clearing date filter');
+    console.log('📅 Switched to period filter:', period);
   };
 
-  // ✅ NEW: Handle date change with filter priority
+  // ✅ FIXED: Handle date change with proper filter management
   const handleDateChange = (e) => {
     const newDate = e.target.value;
+    console.log('📅 Date selected:', newDate);
     setSelectedDate(newDate);
     
-    // Set date filter as active and clear period if date is selected
+    // ✅ FIXED: Set date filter as active if date is selected
     if (newDate) {
       setActiveFilter('date');
-      console.log('📅 Date selected:', newDate, 'switching to date filter');
+      console.log('📅 Switched to date filter:', newDate);
+    } else {
+      // If date is cleared, switch back to period filter
+      setActiveFilter('period');
+      console.log('📅 Date cleared, switched back to period filter');
     }
   };
 
-  // ✅ NEW: Clear date filter and switch back to period
+  // ✅ FIXED: Clear date filter and switch back to period
   const clearDateFilter = () => {
     setSelectedDate('');
     setActiveFilter('period');
-    console.log('📅 Date filter cleared, switching back to period filter');
+    console.log('📅 Date filter cleared, switched back to period filter:', selectedPeriod);
   };
 
   useEffect(() => {
@@ -431,13 +477,13 @@ const Dashboard = () => {
         </div>
         
         <div className="dashboard-dashboard-controls">
-          {/* Period Selector */}
+          {/* ✅ FIXED: Period Selector - Now works as independent filter with correct date calculation */}
           <div className="dashboard-control-item">
             <div className="dashboard-dropdown-container">
               <button 
                 className={`dashboard-dropdown-button ${activeFilter === 'period' ? 'active' : ''}`}
                 onClick={() => setShowPeriodDropdown(!showPeriodDropdown)}
-                disabled={activeFilter === 'date'}
+                title="Select time period filter"
               >
                 {selectedPeriod}
                 <MdKeyboardArrowDown className="dashboard-dropdown-icon" />
@@ -458,7 +504,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Calendar Picker */}
+          {/* ✅ FIXED: Calendar Picker - Works independently */}
           <div className="dashboard-control-item">
             <div className="dashboard-calendar-container">
               <MdCalendarToday className="dashboard-calendar-icon" />
@@ -468,12 +514,13 @@ const Dashboard = () => {
                 onChange={handleDateChange}
                 className={`dashboard-calendar-input ${activeFilter === 'date' ? 'active' : ''}`}
                 placeholder="Select date"
+                title="Select specific date filter"
               />
               {selectedDate && (
                 <button
                   onClick={clearDateFilter}
                   className="dashboard-clear-date-btn"
-                  title="Clear date"
+                  title="Clear date filter"
                 >
                   <MdClose />
                 </button>

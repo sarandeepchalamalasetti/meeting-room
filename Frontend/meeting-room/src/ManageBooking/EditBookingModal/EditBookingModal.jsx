@@ -11,7 +11,8 @@ import {
   FaFileAlt,
   FaExclamationTriangle,
   FaEdit,
-  FaBan
+  FaBan,
+  FaUserClock
 } from 'react-icons/fa';
 
 const EditBookingModal = ({ booking, isOpen, onSave, onCancel }) => {
@@ -26,7 +27,8 @@ const EditBookingModal = ({ booking, isOpen, onSave, onCancel }) => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [conflictError, setConflictError] = useState(null); // ✅ NEW: State for conflict errors
+  const [conflictError, setConflictError] = useState(null);
+  const [bookings, setBookings] = useState([]);
   const [availableRooms] = useState([
     'Conference A1',
     'Board Room A1',
@@ -38,9 +40,145 @@ const EditBookingModal = ({ booking, isOpen, onSave, onCancel }) => {
     'Meeting Room A3'
   ]);
 
+  // Time slots for dropdown
+  const timeSlots = [
+    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+    '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+    '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'
+  ];
+
   // API base URL
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
   const token = sessionStorage.getItem('token');
+
+  // Helper functions for conflict detection
+  const timeToMinutes = (timeStr) => {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
+  };
+
+  const isTimeOverlapping = (start1, end1, start2, end2) => {
+    return start1 < end2 && start2 < end1;
+  };
+
+  // Get conflicting booking info
+  const getConflictingBookingInfo = (roomName, date, startTime, durationMinutes) => {
+    const startMinutes = timeToMinutes(startTime);
+    const endMinutes = startMinutes + parseInt(durationMinutes);
+    
+    const conflictingBookings = bookings.filter(bookingItem => 
+      bookingItem.roomName === roomName && 
+      bookingItem.date === date &&
+      (bookingItem.status === 'approved' || bookingItem.status === 'pending') &&
+      bookingItem._id !== booking?.id // Exclude current booking being edited
+    );
+
+    for (let conflictBooking of conflictingBookings) {
+      const bookingStartMinutes = timeToMinutes(conflictBooking.startTime);
+      const bookingEndMinutes = timeToMinutes(conflictBooking.endTime);
+      
+      if (isTimeOverlapping(startMinutes, endMinutes, bookingStartMinutes, bookingEndMinutes)) {
+        return {
+          hasConflict: true,
+          conflictingBooking: conflictBooking,
+          bookedBy: conflictBooking.bookedBy?.name || conflictBooking.bookedBy?.username || 'Unknown User',
+          timeSlot: `${conflictBooking.startTime} to ${conflictBooking.endTime}`
+        };
+      }
+    }
+    
+    return { hasConflict: false };
+  };
+
+  // ✅ FIXED: Check current form for conflicts only when all required fields are filled
+  const checkCurrentFormConflict = () => {
+    // Only check for conflicts when all required fields are filled
+    if (!formData.room || !formData.date || !formData.startTime || !formData.duration) {
+      return null;
+    }
+
+    const conflictInfo = getConflictingBookingInfo(
+      formData.room, 
+      formData.date, 
+      formData.startTime, 
+      formData.duration
+    );
+
+    if (conflictInfo.hasConflict) {
+      const conflictingBooking = conflictInfo.conflictingBooking;
+      
+      // Format the date for better display
+      const formatDate = (dateStr) => {
+        try {
+          const date = new Date(dateStr);
+          return date.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          });
+        } catch (error) {
+          return dateStr;
+        }
+      };
+
+      return {
+        message: `This time slot is already booked! The room "${formData.room}" is reserved from ${conflictingBooking.startTime} to ${conflictingBooking.endTime} on ${formatDate(conflictingBooking.date)} by ${conflictingBooking.bookedBy.name}.`,
+        conflictingBooking: {
+          startTime: conflictingBooking.startTime,
+          endTime: conflictingBooking.endTime,
+          date: conflictingBooking.date,
+          bookedBy: conflictingBooking.bookedBy.name,
+          status: conflictingBooking.status,
+          room: formData.room,
+          userEmail: conflictingBooking.bookedBy.email || 'N/A',
+          purpose: conflictingBooking.purpose || 'N/A'
+        },
+        type: 'BOOKING_CONFLICT'
+      };
+    }
+
+    return null;
+  };
+
+  // Get available time slots (filter out conflicting ones)
+  const getAvailableTimeSlots = () => {
+    if (!formData.room || !formData.date || !formData.duration) {
+      return timeSlots;
+    }
+
+    return timeSlots.filter(timeSlot => {
+      const testConflict = getConflictingBookingInfo(
+        formData.room,
+        formData.date,
+        timeSlot,
+        formData.duration
+      );
+      return !testConflict.hasConflict;
+    });
+  };
+
+  // Fetch all bookings for conflict checking
+  const fetchBookings = async () => {
+    try {
+      if (!token) {
+        setBookings([]);
+        return;
+      }
+
+      const response = await axios.get(`${API_BASE_URL}/bookings`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        timeout: 10000
+      });
+      
+      setBookings(response.data || []);
+      
+    } catch (error) {
+      console.error('Failed to fetch bookings for conflict checking:', error);
+      setBookings([]);
+    }
+  };
 
   // Initialize form data when booking changes
   useEffect(() => {
@@ -96,8 +234,26 @@ const EditBookingModal = ({ booking, isOpen, onSave, onCancel }) => {
         attendees: booking.attendees || 1,
         description: booking.description || booking.title || ''
       });
+
+      // Fetch bookings when booking data is available
+      fetchBookings();
+      
+      // Clear any existing conflict error when new booking is loaded
+      setConflictError(null);
     }
   }, [booking]);
+
+  // ✅ FIXED: Only check for conflicts when form values change AND all required fields are filled
+  useEffect(() => {
+    // Only check for conflicts if we have bookings data and all required fields are filled
+    if (bookings.length > 0 && formData.room && formData.date && formData.startTime && formData.duration) {
+      const conflict = checkCurrentFormConflict();
+      setConflictError(conflict);
+    } else {
+      // Clear conflict error if any required field is missing
+      setConflictError(null);
+    }
+  }, [formData.room, formData.date, formData.startTime, formData.duration, bookings]);
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -113,11 +269,6 @@ const EditBookingModal = ({ booking, isOpen, onSave, onCancel }) => {
         ...prev,
         [name]: ''
       }));
-    }
-    
-    // ✅ NEW: Clear conflict error when user changes conflicting fields
-    if (conflictError && (name === 'date' || name === 'startTime' || name === 'duration' || name === 'room')) {
-      setConflictError(null);
     }
   };
 
@@ -169,8 +320,12 @@ const EditBookingModal = ({ booking, isOpen, onSave, onCancel }) => {
       return;
     }
 
+    // Prevent saving if there's a conflict
+    if (conflictError) {
+      return;
+    }
+
     setLoading(true);
-    setConflictError(null); // ✅ Clear any previous conflict errors
 
     try {
       console.log('💾 Updating booking:', booking.id);
@@ -220,7 +375,7 @@ const EditBookingModal = ({ booking, isOpen, onSave, onCancel }) => {
         errorMessage = 'You do not have permission to update this booking.';
         alert(errorMessage);
       } else if (error.response?.status === 409) {
-        // ✅ ENHANCED: Handle booking conflicts with detailed UI
+        // Handle booking conflicts with detailed UI
         const conflictData = error.response.data;
         console.log('⚠️ Booking conflict detected:', conflictData);
         
@@ -229,8 +384,6 @@ const EditBookingModal = ({ booking, isOpen, onSave, onCancel }) => {
           conflictingBooking: conflictData.conflictingBooking,
           type: conflictData.type || 'BOOKING_CONFLICT'
         });
-        
-        // Don't show alert for conflicts, show in UI instead
       } else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
         alert(errorMessage);
@@ -245,7 +398,7 @@ const EditBookingModal = ({ booking, isOpen, onSave, onCancel }) => {
   // Handle cancel
   const handleCancel = () => {
     setErrors({});
-    setConflictError(null); // ✅ Clear conflict error
+    setConflictError(null);
     onCancel();
   };
 
@@ -261,6 +414,9 @@ const EditBookingModal = ({ booking, isOpen, onSave, onCancel }) => {
     }
     return '';
   };
+
+  // Get available time slots with conflict filtering
+  const availableTimeSlots = getAvailableTimeSlots();
 
   if (!isOpen) return null;
 
@@ -281,34 +437,45 @@ const EditBookingModal = ({ booking, isOpen, onSave, onCancel }) => {
           </button>
         </div>
 
-        {/* ✅ NEW: Conflict Error Alert */}
+        {/* ✅ FIXED: Only show conflict alert when there's an actual conflict */}
         {conflictError && (
           <div className="edit-conflict-alert">
             <div className="edit-conflict-header">
               <FaBan className="edit-conflict-icon" />
-              <h3>Time Slot Conflict</h3>
+              <h3>Time Slot Already Booked</h3>
             </div>
             <div className="edit-conflict-message">
               {conflictError.message}
             </div>
             {conflictError.conflictingBooking && (
               <div className="edit-conflict-details">
-                <strong>Conflicting booking details:</strong>
-                <ul>
-                  <li><strong>Time:</strong> {conflictError.conflictingBooking.startTime} - {conflictError.conflictingBooking.endTime}</li>
-                  <li><strong>Date:</strong> {conflictError.conflictingBooking.date}</li>
-                  <li><strong>Booked by:</strong> {conflictError.conflictingBooking.bookedBy}</li>
-                  <li><strong>Status:</strong> {conflictError.conflictingBooking.status}</li>
-                </ul>
+                <div className="edit-conflict-user-info">
+                  <FaUserClock className="edit-conflict-user-icon" />
+                  <div className="edit-conflict-user-details">
+                    <strong>Booked by:</strong> {conflictError.conflictingBooking.bookedBy}
+                    <br />
+                    <small>Email: {conflictError.conflictingBooking.userEmail}</small>
+                  </div>
+                </div>
+                <div className="edit-conflict-booking-info">
+                  <strong>Conflicting booking details:</strong>
+                  <ul>
+                    <li><strong>Time:</strong> {conflictError.conflictingBooking.startTime} - {conflictError.conflictingBooking.endTime}</li>
+                    <li><strong>Date:</strong> {conflictError.conflictingBooking.date}</li>
+                    <li><strong>Status:</strong> {conflictError.conflictingBooking.status}</li>
+                    <li><strong>Purpose:</strong> {conflictError.conflictingBooking.purpose}</li>
+                  </ul>
+                </div>
               </div>
             )}
             <div className="edit-conflict-suggestion">
-              💡 <strong>Suggestion:</strong> Try changing the time, duration, or date to avoid this conflict.
+              💡 <strong>Suggestion:</strong> Please choose a different time slot. The blocked times have been removed from the time selection dropdown.
             </div>
           </div>
         )}
-
+        
         <form onSubmit={handleSubmit} className="edit-modal-form">
+          {/* ✅ FIXED: Added scrollable form content */}
           <div className="edit-modal-form-content">
             {/* Meeting Title */}
             <div className="edit-form-group">
@@ -360,18 +527,33 @@ const EditBookingModal = ({ booking, isOpen, onSave, onCancel }) => {
                 <label className="edit-form-label">
                   <FaClock className="edit-form-label-icon" />
                   Start Time *
+                  {availableTimeSlots.length < timeSlots.length && (
+                    <span className="edit-form-label-info">
+                      ({timeSlots.length - availableTimeSlots.length} slots unavailable)
+                    </span>
+                  )}
                 </label>
-                <input
-                  type="time"
+                <select
                   name="startTime"
                   value={formData.startTime}
                   onChange={handleInputChange}
                   className={`edit-form-input ${errors.startTime ? 'edit-form-input-error' : ''} ${conflictError ? 'edit-form-input-conflict' : ''}`}
-                />
+                >
+                  <option value="">Select time</option>
+                  {availableTimeSlots.map(time => (
+                    <option key={time} value={time}>{time}</option>
+                  ))}
+                </select>
                 {errors.startTime && (
                   <span className="edit-form-error">
                     <FaExclamationTriangle className="edit-error-icon" />
                     {errors.startTime}
+                  </span>
+                )}
+                {availableTimeSlots.length === 0 && formData.room && formData.date && (
+                  <span className="edit-form-warning">
+                    <FaExclamationTriangle className="edit-error-icon" />
+                    No available time slots for selected room and date
                   </span>
                 )}
               </div>
@@ -509,13 +691,23 @@ const EditBookingModal = ({ booking, isOpen, onSave, onCancel }) => {
             </button>
             <button
               type="submit"
-              className="edit-modal-btn edit-modal-save-btn"
-              disabled={loading || conflictError} // ✅ Disable save if there's a conflict
+              className={`edit-modal-btn edit-modal-save-btn ${conflictError ? 'edit-modal-save-btn-disabled' : ''}`}
+              disabled={loading || conflictError}
             >
               <FaSave className="edit-btn-icon" />
               {loading ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
+
+          {/* Conflict prevention notice */}
+          {conflictError && (
+            <div className="edit-conflict-prevention-notice">
+              <FaBan className="edit-notice-icon" />
+              <p className="edit-notice-text">
+                Cannot save booking due to time slot conflict. Please select a different time.
+              </p>
+            </div>
+          )}
         </form>
       </div>
     </div>
